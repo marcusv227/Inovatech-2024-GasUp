@@ -15,7 +15,7 @@ export default function Index() {
     const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
     const [gasStations, setGasStations] = useState<any[]>([]);
     const mapRef = useRef<MapView>(null);
-    const apiKey = 'YOUR_API_KEY';
+    const apiKey = 'AIzaSyB7tn6ZJMq92Ys6kbSVV-J3HS3-fSAzeew';
 
     const requestLocationPermission = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -55,7 +55,7 @@ export default function Index() {
     };
 
     const fetchGasStations = async (latitude: number, longitude: number) => {
-        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&type=gas_station&key=${apiKey}`;
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=2500&type=gas_station&key=${apiKey}`;
 
         try {
             const response = await fetch(url);
@@ -120,7 +120,7 @@ export default function Index() {
                         showsUserLocation={true}
                         followsUserLocation={true}
                         showsMyLocationButton={false}
-                        showsCompass={false}
+                        showsCompass={true}
                     >
                         {gasStations.map((place, index) => (
                             <Marker

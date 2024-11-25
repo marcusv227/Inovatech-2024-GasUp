@@ -36,7 +36,9 @@ export const styles = StyleSheet.create({
     marginTop: 5,
   },
   infoText: {
-
+    marginLeft: 10,
+  },
+  infoTextBairro: {
     marginLeft: 10,
   },
   button: {
@@ -50,5 +52,21 @@ export const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-
+  balon: {
+    height: 38,
+    width: 38,
+    borderRadius: 100,
+    borderWidth: 2,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fab: {
+    backgroundColor: theme.colors.primary,
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    width: 56,
+  },
 });
