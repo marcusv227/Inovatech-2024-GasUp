@@ -1,46 +1,46 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { styles } from '../../assets/styles/stylesAlert';
-import { MapPinned, CalendarDays, Clock } from 'lucide-react-native'
+import { DollarSign, Fuel } from 'lucide-react-native'
+import theme from '../../assets/theme';
 
 type alertItem = {
   local: string
-  data: string
+  preço: string
   horario: string
 }
 
 
-const OcorrenciaItem = ({ local, data, horario }: alertItem) => (
+const OcorrenciaItem = ({ local, preço }: alertItem) => (
   <View style={styles.innerBox}>
     <View style={styles.infoRow}>
 
-      <MapPinned size={20} color="#000" />
+      <Fuel size={20} color={theme.colors.primary} />
       <Text style={styles.infoText}>Local: {local}</Text>
 
     </View>
     <View style={styles.infoRow}>
 
-      <CalendarDays size={20} color="#000" />
-      <Text style={styles.infoText}>Data: {data}</Text>
+      <DollarSign size={20} color={theme.colors.primary} />
+      <Text style={styles.infoText}>Preço: {preço}</Text>
 
     </View>
+    <TouchableOpacity>
+      <View style={styles.botao}>
+        <Text style={styles.buttonText}>Ver rota</Text>
+      </View>
+    </TouchableOpacity>
 
-    <View style={styles.infoRow}>
-
-      <Clock size={20} color="#000" />
-      <Text style={styles.infoText}>Horário: {horario}</Text>
-
-    </View>
   </View>
 );
 
 export default function Ocorrencia() {
   const dadosMocados = [
-    { local: 'Local 1', data: '01/01/2024', horario: '10:00' },
-    { local: 'Local 2', data: '02/01/2024', horario: '14:30' },
-    { local: 'Local 3', data: '03/01/2024', horario: '16:45' },
-    { local: 'Local 4', data: '04/01/2024', horario: '09:15' },
-    { local: 'Local 5', data: '05/01/2024', horario: '12:00' },
+    { local: 'Local 1', preço: 'R$ 6,99', horario: '10:00' },
+    { local: 'Local 2', preço: 'R$ 6,99', horario: '14:30' },
+    { local: 'Local 3', preço: 'R$ 6,99', horario: '16:45' },
+    { local: 'Local 4', preço: 'R$ 6,99', horario: '09:15' },
+    { local: 'Local 5', preço: 'R$ 6,99', horario: '12:00' },
 
   ];
 
@@ -52,14 +52,11 @@ export default function Ocorrencia() {
           <OcorrenciaItem
             key={index}
             local={dados.local}
-            data={dados.data}
+            preço={dados.preço}
             horario={dados.horario}
           />
         ))}
       </View>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Crie a sua</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }

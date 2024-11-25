@@ -1,25 +1,21 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
-import MapView, { Marker } from "react-native-maps";  // Importando o Marker para desenhar os marcadores no mapa
+import { View, Text, TouchableOpacity } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { FAB } from "react-native-paper";
 import { styles } from '../../assets/styles/stylesIndex';
-import * as yup from 'yup';
+import React from "react";
+import { Fuel } from "lucide-react-native";
+import theme from "../../assets/theme";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type FormAlertProps = {
-    description: string
-}
-
-const alertUpSchema = yup.object({
-    description: yup.string().required("*O campo acima não pode está vazio")
-})
-
-export default function Index({ description }: FormAlertProps) {
+export default function Index() {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [loading, setLoading] = useState(true);
     const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
-    const [gasStations, setGasStations] = useState<any[]>([]); // Para armazenar os postos de gasolina
+    const [gasStations, setGasStations] = useState<any[]>([]);
     const mapRef = useRef<MapView>(null);
+    const apiKey = 'YOUR_API_KEY';
 
     const requestLocationPermission = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -41,6 +37,10 @@ export default function Index({ description }: FormAlertProps) {
             const userLocation = await getUserLocation();
             setLocation(userLocation);
             setLocationPermissionDenied(false);
+
+            await AsyncStorage.setItem('userLocation', JSON.stringify(userLocation));
+        } catch (error) {
+            console.error("Erro ao buscar localização:", error);
         } finally {
             setLoading(false);
         }
@@ -54,9 +54,7 @@ export default function Index({ description }: FormAlertProps) {
         }
     };
 
-    // Função para buscar os postos de gasolina usando a API do Google
     const fetchGasStations = async (latitude: number, longitude: number) => {
-        const apiKey = 'AIzaSyD_kPsDn8IpEN-jbXtDyzF4yDOrFWwPoVk'; // Substitua com sua chave de API
         const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&type=gas_station&key=${apiKey}`;
 
         try {
@@ -73,21 +71,34 @@ export default function Index({ description }: FormAlertProps) {
     };
 
     useEffect(() => {
-        fetchLocation();
-        Location.watchPositionAsync(
-            {
-                accuracy: Location.LocationAccuracy.Highest,
-                timeInterval: 1000,
-                distanceInterval: 1,
-            },
-            (res) => {
-                setLocation(res);
-                mapRef.current?.animateCamera({
-                    center: res.coords,
-                });
-                fetchGasStations(res.coords.latitude, res.coords.longitude); // Busca os postos de gasolina a cada atualização de localização
-            });
+        const loadLocationFromStorage = async () => {
+            const savedLocation = await AsyncStorage.getItem('userLocation');
+            if (savedLocation) {
+                const parsedLocation = JSON.parse(savedLocation);
+                setLocation(parsedLocation);
+                fetchGasStations(parsedLocation.coords.latitude, parsedLocation.coords.longitude);
+                setLoading(false);
+            } else {
+                fetchLocation();
+            }
+        };
+
+        loadLocationFromStorage();
     }, []);
+
+    const defaultLocation = {
+        latitude: -3.0967102598408895,
+        longitude: -60.02555758643335,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002
+    };
+
+    const region = location ? {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002
+    } : defaultLocation;
 
     return (
         <View style={styles.container}>
@@ -102,43 +113,31 @@ export default function Index({ description }: FormAlertProps) {
                 </View>
             ) : (
                 <>
-                    {location ? (
-                        <MapView
-                            ref={mapRef}
-                            style={styles.map}
-                            initialRegion={{
-                                latitude: location.coords.latitude,
-                                longitude: location.coords.longitude,
-                                latitudeDelta: 0.002,
-                                longitudeDelta: 0.002,
-                            }}
-                            showsUserLocation={true}
-                            followsUserLocation={true}
-                            showsMyLocationButton={false}
-                            showsCompass={false}
-                        >
-                            {/* Adicionando marcadores para cada posto de gasolina */}
-                            {gasStations.map((station, index) => (
-                                <Marker
-                                    key={index}
-                                    coordinate={{
-                                        latitude: station.geometry.location.lat,
-                                        longitude: station.geometry.location.lng,
-                                    }}
-                                    title={station.name}
-                                    description={station.vicinity}
-                                />
-                            ))}
-                        </MapView>
-                    ) : (
-                        <MapView style={styles.map}
-                            initialRegion={{
-                                latitude: -3.10719,
-                                longitude: -60.0261,
-                                latitudeDelta: 0.002,
-                                longitudeDelta: 0.002
-                            }} />
-                    )}
+                    <MapView
+                        ref={mapRef}
+                        style={styles.map}
+                        initialRegion={region}
+                        showsUserLocation={true}
+                        followsUserLocation={true}
+                        showsMyLocationButton={false}
+                        showsCompass={false}
+                    >
+                        {gasStations.map((place, index) => (
+                            <Marker
+                                key={index}
+                                coordinate={{
+                                    latitude: place.geometry.location.lat,
+                                    longitude: place.geometry.location.lng,
+                                }}
+                                title={place.name}
+                                description={place.vicinity}
+                            >
+                                <View style={styles.balon}>
+                                    <Fuel size={20} color={theme.colors.primary} />
+                                </View>
+                            </Marker>
+                        ))}
+                    </MapView>
                     <FAB
                         icon="crosshairs-gps"
                         style={styles.fab}

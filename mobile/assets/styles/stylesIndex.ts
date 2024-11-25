@@ -68,4 +68,13 @@ export const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: 'center',
     },
+    balon: {
+        height: 38,
+        width: 38,
+        borderRadius: 100,
+        borderWidth: 2,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });

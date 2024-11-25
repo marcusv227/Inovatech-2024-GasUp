@@ -28,6 +28,13 @@ export const styles = StyleSheet.create({
     marginVertical: 5,
     marginBottom: 5,
   },
+  botao: {
+    backgroundColor: theme.colors.primary,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 5,
+  },
   infoText: {
 
     marginLeft: 10,
