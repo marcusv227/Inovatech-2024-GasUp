@@ -69,8 +69,8 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
     },
     balon: {
-        height: 38,
-        width: 38,
+        height: 34,
+        width: 34,
         borderRadius: 100,
         borderWidth: 2,
         backgroundColor: 'white',

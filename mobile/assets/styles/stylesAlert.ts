@@ -53,8 +53,8 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   balon: {
-    height: 38,
-    width: 38,
+    height: 34,
+    width: 34,
     borderRadius: 100,
     borderWidth: 2,
     backgroundColor: theme.colors.primary,
