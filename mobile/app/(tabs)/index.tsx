@@ -15,7 +15,7 @@ export default function Index() {
     const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
     const [gasStations, setGasStations] = useState<any[]>([]);
     const mapRef = useRef<MapView>(null);
-    const apiKey = 'AIzaSyB7tn6ZJMq92Ys6kbSVV-J3HS3-fSAzeew';
+    const apiKey = 'YOUR_API_KEY';
 
     const requestLocationPermission = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
