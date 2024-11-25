@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   createButton: {
-    marginTop: 50,
     flexDirection: 'column',  
     alignItems: 'center',
     gap: 10,
@@ -31,7 +30,7 @@ export const styles = StyleSheet.create({
   textHeader: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: theme.colors.primary,
+    color: 'black',
   },
   avatar: {
     marginBottom: 30,
@@ -83,6 +82,7 @@ export const styles = StyleSheet.create({
   },
   intro: {
     alignItems: 'center',
+    marginTop: 50,
   },
   image: {
     width: 300,

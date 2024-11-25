@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { styles } from '../assets/styles/stylesSignUp';
 
 import FullLogo from '../assets/SafewaysLogoFullLateral.svg'
+import GasUpLogo from '../assets/GasUpLogo.svg'
 import { useForm, Controller } from 'react-hook-form';
 
 import * as yup from 'yup';
@@ -46,7 +47,7 @@ export default function signUp({ setScreen }: SignUpProps) {
         <View style={styles.formContainer}>
 
           <View style={styles.logo}>
-            <FullLogo />
+            <GasUpLogo />
           </View>
 
           <Text style={styles.title}>Acesse a conta</Text>

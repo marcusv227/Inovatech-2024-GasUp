@@ -1,7 +1,7 @@
 import { View, Image } from "react-native";
 import { Text, Appbar, Menu, IconButton } from "react-native-paper";
 import { Button } from "../src/components/button";
-import SafewaysSvg from "../assets/SafewaysLogo.svg";
+import GasUpSvg from "../assets/GasUpPin.svg";
 import { useState } from "react";
 import { styles } from '../assets/styles/stylesProfile';
 
@@ -19,7 +19,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ onLoginPress, onRegisterPress
     return (
         <View style={styles.container}>
             <Appbar.Header style={styles.header}>
-                <SafewaysSvg />
+                <GasUpSvg />
                 <Text style={styles.textHeader}>Usuário</Text>
                 <Menu visible={visible}
                     onDismiss={closeMenu}
@@ -35,7 +35,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ onLoginPress, onRegisterPress
             <View style={styles.profileContainer}>
                 <View style={styles.intro}>
                     <Image
-                        source={require('../assets/Safeways.png')}
+                        source={require('../assets/GasUp.png')}
                         style={styles.image}
                     />
                 </View>

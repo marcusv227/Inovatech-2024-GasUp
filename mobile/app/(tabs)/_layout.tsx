@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import theme from '../../assets/theme';
 
 const TabLayout = () => {
   return (
@@ -13,15 +15,15 @@ const TabLayout = () => {
         options={{
           title: 'Map',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
-          tabBarActiveTintColor: '#333333'
+          tabBarActiveTintColor: theme.colors.primary
         }}
       />
       <Tabs.Screen
-        name="alert"
+        name="stations"
         options={{
-          title: 'Alerts',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="warning" color={color} />,
-          tabBarActiveTintColor: '#333333'
+          title: 'Stations',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="local-gas-station" color={color} />,
+          tabBarActiveTintColor: theme.colors.primary
         }}
       />
       <Tabs.Screen
@@ -29,7 +31,7 @@ const TabLayout = () => {
         options={{
           title: 'User',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
-          tabBarActiveTintColor: '#333333'
+          tabBarActiveTintColor: theme.colors.primary
         }}
       />
     </Tabs>

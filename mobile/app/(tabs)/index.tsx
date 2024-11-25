@@ -1,13 +1,10 @@
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
-import MapView, { Circle } from "react-native-maps";  // Importando o Circle para desenhar os círculos no mapa
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import MapView, { Marker } from "react-native-maps";  // Importando o Marker para desenhar os marcadores no mapa
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Button, FAB, TextInput } from "react-native-paper";
+import { FAB } from "react-native-paper";
 import { styles } from '../../assets/styles/stylesIndex';
-import { Modal } from '../../src/components/modal';
-import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup'
 
 type FormAlertProps = {
     description: string
@@ -21,21 +18,8 @@ export default function Index({ description }: FormAlertProps) {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [loading, setLoading] = useState(true);
     const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+    const [gasStations, setGasStations] = useState<any[]>([]); // Para armazenar os postos de gasolina
     const mapRef = useRef<MapView>(null);
-    const { control, handleSubmit, setValue, formState: { errors }, reset } = useForm<FormAlertProps>({
-        resolver: yupResolver(alertUpSchema),
-        defaultValues: { description: description || '' },
-    });
-
-    const handleFormSubmit = ({ description }: FormAlertProps) => {
-        console.log('Formulário enviado com dados:', description);
-        setVisible(false);
-        reset();
-    };
-
-    const [visible, setVisible] = useState(false);
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
 
     const requestLocationPermission = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -70,6 +54,24 @@ export default function Index({ description }: FormAlertProps) {
         }
     };
 
+    // Função para buscar os postos de gasolina usando a API do Google
+    const fetchGasStations = async (latitude: number, longitude: number) => {
+        const apiKey = 'AIzaSyD_kPsDn8IpEN-jbXtDyzF4yDOrFWwPoVk'; // Substitua com sua chave de API
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&type=gas_station&key=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.status === "OK") {
+                setGasStations(data.results);
+            } else {
+                console.error("Erro ao buscar postos de gasolina:", data.error_message);
+            }
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+        }
+    };
+
     useEffect(() => {
         fetchLocation();
         Location.watchPositionAsync(
@@ -83,51 +85,9 @@ export default function Index({ description }: FormAlertProps) {
                 mapRef.current?.animateCamera({
                     center: res.coords,
                 });
+                fetchGasStations(res.coords.latitude, res.coords.longitude); // Busca os postos de gasolina a cada atualização de localização
             });
     }, []);
-
-    const areasDePerigo = [
-        {
-            id: 1,
-            latitude: -3.10719,
-            longitude: -60.0261,
-            radius: 100,
-            description: "Área de risco 1 - Incidente de trânsito",
-            pessoasRelataram: 5
-        },
-        {
-            id: 2,
-            latitude: -3.123954,
-            longitude: -60.026702,
-            radius: 100,
-            description: "Área de risco 2 - Assalto a mão armada",
-            pessoasRelataram: 8
-        },
-        {
-            id: 3,
-            latitude: -3.101242,
-            longitude: -60.056925,
-            radius: 100,
-            description: "Área de risco 3 - Desabamento",
-            pessoasRelataram: 2
-        },
-        {
-            id: 4,
-            latitude: -3.028352,
-            longitude: -59.928522,
-            radius: 100,
-            description: "Área de risco 4 - roubo de veículos",
-            pessoasRelataram: 5
-        },
-        {
-            id: 5,
-            latitude: -3.141209,
-            longitude: -60.010049,
-            radius: 100,
-            description: "Área de risco 5 - Boca de fumo",
-            pessoasRelataram: 10
-        },
-    ];
 
     return (
         <View style={styles.container}>
@@ -157,14 +117,16 @@ export default function Index({ description }: FormAlertProps) {
                             showsMyLocationButton={false}
                             showsCompass={false}
                         >
-                            {areasDePerigo.map((area) => (
-                                <Circle
-                                    key={area.id}
-                                    center={{ latitude: area.latitude, longitude: area.longitude }}
-                                    radius={area.radius}
-                                    strokeColor="red"
-                                    fillColor="rgba(255, 0, 0, 0.3)"
-                                    strokeWidth={2}
+                            {/* Adicionando marcadores para cada posto de gasolina */}
+                            {gasStations.map((station, index) => (
+                                <Marker
+                                    key={index}
+                                    coordinate={{
+                                        latitude: station.geometry.location.lat,
+                                        longitude: station.geometry.location.lng,
+                                    }}
+                                    title={station.name}
+                                    description={station.vicinity}
                                 />
                             ))}
                         </MapView>
@@ -183,44 +145,6 @@ export default function Index({ description }: FormAlertProps) {
                         onPress={centerUserLocation}
                         color="white"
                     />
-                    <FAB
-                        icon="alert"
-                        style={styles.fab2}
-                        onPress={showModal}
-                        color="white"
-                    />
-                    <Modal
-                        visible={visible}
-                        onDismiss={() => {
-                            setVisible(false);
-                            reset({ description: "" });
-                        }}
-                        onConfirm={handleSubmit(handleFormSubmit)}
-                        title="Descrição da ocorrência"
-                        description={description}
-                        isForm={true}
-                    >
-                        <View>
-                            <Controller
-                                control={control}
-                                name='description'
-                                render={({ field: { onChange, value } }) => (
-                                    <TextInput
-                                        placeholder='Descreva a ocorrência...'
-                                        placeholderTextColor="#71717a"
-                                        mode="outlined"
-                                        theme={{ colors: { background: "ffffff" } }}
-                                        onChangeText={onChange}
-                                        value={value}
-                                        multiline={true}
-                                        textAlignVertical="top"
-                                        style={styles.inputModal}
-                                    />
-                                )}
-                            />
-                        </View>
-                        {errors.description?.message && <Text style={{ color: 'red' }}>{errors.description.message}</Text>}
-                    </Modal>
                 </>
             )}
         </View>
